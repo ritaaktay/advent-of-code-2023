@@ -1,0 +1,14 @@
+{
+  "name": "advent-of-code-2023",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/ritaaktay/advent-of-code-2023.git",
+  "author": "ritaaktay <rita.aktay@vodaofone.com>",
+  "license": "MIT",
+  "dependencies": {
+    "jest": "^29.7.0"
+  },
+  "scripts": {
+    "test": "jest ./day-1/solution.test.js"
+  }
+}
