@@ -9,6 +9,6 @@
     "jest": "^29.7.0"
   },
   "scripts": {
-    "test": "jest ./day-1/solution.test.js"
+    "test": "jest"
   }
 }
