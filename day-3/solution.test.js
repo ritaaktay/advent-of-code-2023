@@ -12,7 +12,6 @@ const getNumberMatches = (row) => {
 };
 
 const isSymbol = (char) => {
-  if (!char) return false;
   const regex = new RegExp(/[^0-9\.]/);
   return !!char.match(regex);
 };
@@ -40,13 +39,15 @@ const getNeighbourCoordinates = (
   }
 
   // Filter out indices that don't exist (for matches on sides)
-  return neighbourCoords.filter(([row, col]) => {
+  const filtered = neighbourCoords.filter(([row, col]) => {
     return row >= 0 && row <= matrixHeight && col >= 0 && col <= matrixWidth;
   });
+
+  return filtered;
 };
 
 const hasSymbolNeighbour = (match, rowIndex, matrix) => {
-  const matrixWidth = matrix[rowIndex].length;
+  const matrixWidth = matrix[rowIndex].length - 1;
   const matrixHeight = matrix.length - 1;
 
   for (let [row, col] of getNeighbourCoordinates(
