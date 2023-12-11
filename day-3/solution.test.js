@@ -8,8 +8,7 @@ const input = readFileSync("./day-3/input-1.txt").toString().split("\n");
 // Solutions
 const getNumberMatches = (row) => {
   const regex = new RegExp("\\d+", "g");
-  const matches = Array.from(row.matchAll(regex));
-  return matches;
+  return Array.from(row.matchAll(regex));
 };
 
 const isSymbol = (char) => {
