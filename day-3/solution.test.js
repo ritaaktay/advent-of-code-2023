@@ -1,6 +1,4 @@
-const { match } = require("assert");
 const { readFileSync } = require("fs");
-const { get } = require("http");
 
 // Inputs
 const mock1 = readFileSync("./day-3/mock-1.txt").toString().split("\n");
