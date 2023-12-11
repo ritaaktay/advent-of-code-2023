@@ -19,24 +19,17 @@ const getMinimumForColor = (game, color) => {
   return Math.max(...matches);
 };
 
-const gameIsPossible = (game) => {
-  const limits = {
-    red: 12,
-    green: 13,
-    blue: 14,
-  };
-
+const gameIsPossible = (game, limits) => {
   for (let color of colors) {
-    const minimumForColor = getMinimumForColor(game, color);
-    if (minimumForColor > limits[color]) return false;
+    if (getMinimumForColor(game, color) > limits[color]) return false;
   }
 
   return true;
 };
 
-const getPossibleGameIdsTotal = (games) => {
+const getPossibleGameIdsTotal = (games, limits) => {
   return games
-    .filter(gameIsPossible)
+    .filter((game) => gameIsPossible(game, limits))
     .map((game) => {
       return Number(game.match(/Game (\d+)/)[1]);
     })
@@ -57,7 +50,13 @@ const getPowersOfAllGameLimits = (games) => {
 // Tests
 describe("solution", () => {
   it("should return the correct answer for mock 1", () => {
-    expect(getPossibleGameIdsTotal(mock1)).toBe(8);
+    expect(
+      getPossibleGameIdsTotal(mock1, {
+        red: 12,
+        green: 13,
+        blue: 14,
+      })
+    ).toBe(8);
   });
   it("should return the correct answer for mock 2", () => {
     expect(getPowersOfAllGameLimits(mock1)).toBe(2286);
@@ -65,5 +64,12 @@ describe("solution", () => {
 });
 
 // Answers
-console.log("Part 1:", getPossibleGameIdsTotal(input)); // 2771
+console.log(
+  "Part 1:",
+  getPossibleGameIdsTotal(input, {
+    red: 12,
+    green: 13,
+    blue: 14,
+  })
+); // 2771
 console.log("Part 2:", getPowersOfAllGameLimits(input)); // 70924
