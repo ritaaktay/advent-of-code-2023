@@ -49,7 +49,7 @@ const getPowersOfAllGameLimits = (games) => {
 
 // Tests
 describe("solution", () => {
-  it("should return the correct answer for mock 1", () => {
+  it("should return the correct answer for part 1 mock", () => {
     expect(
       getPossibleGameIdsTotal(mock1, {
         red: 12,
@@ -58,7 +58,7 @@ describe("solution", () => {
       })
     ).toBe(8);
   });
-  it("should return the correct answer for mock 2", () => {
+  it("should return the correct answer for part 2 mock", () => {
     expect(getPowersOfAllGameLimits(mock1)).toBe(2286);
   });
 });
