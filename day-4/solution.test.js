@@ -10,8 +10,8 @@ const input = readFileSync("./day-4/input-1.txt").toString().split("\n");
 /* 
   Card:
   {
-    need: [ '41', '48' ] // index 0 = winning numbers
-    have: [ '34', '41' ] // index 1 = numbers posessed
+    need: [ '41', '48' ]
+    have: [ '34', '41' ]
     matches: 1
     copies: 1
   }
@@ -60,8 +60,7 @@ const getTotalPointsForCards = (cards) => {
 
 const getScratchCardAmount = (cards) => {
   for (let i = 0; i < cards.length; i++) {
-    // Loop through the next X cards
-    // Where X is the number of matches for current card
+    // Loop through the next [current card's matches] cards
     for (let x = i + 1; x <= i + cards[i].matches; x++) {
       // Increment copies by one for each copy of current card
       cards[x].copies += cards[i].copies;
