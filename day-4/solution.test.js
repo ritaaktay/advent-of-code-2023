@@ -1,6 +1,4 @@
-const { group } = require("console");
 const { readFileSync } = require("fs");
-const { parse } = require("path");
 
 // Inputs
 const mock = readFileSync("./day-4/mock-1.txt").toString().split("\n");
@@ -16,9 +14,9 @@ const input = readFileSync("./day-4/input-1.txt").toString().split("\n");
     copies: 1
   }
 */
-const parseCards = (cards) => {
-  return cards.map((card) => {
-    const parts = card
+const parseCards = (input) => {
+  return input.map((line) => {
+    const parts = line
       .split(":")[1]
       .split("|")
       .map((group) =>
@@ -37,28 +35,22 @@ const parseCards = (cards) => {
 };
 
 /*
-  i => number of matches
-  0 => points doubled for each match 
-    ex. 1 match, 1 point
-        2 matches 1 * 2 = 2 points
-        3 matches 1 * 2 * 2 = 4 points 
+  1 match, 1 point
+  2 matches, 1 * 2 = 2 points
+  3 matches, 1 * 2 * 2 = 4 points 
 */
-const getPointsForMatchAmount = (matchAmount) => {
-  if (matchAmount === 0) return 0;
-  let total = 1;
-  for (let i = 1; i < matchAmount; i++) {
-    total *= 2;
-  }
-  return total;
+const getPointsForMatches = (match) => {
+  if (!match) return 0;
+  return 1 * Math.pow(2, match - 1);
 };
 
 const getTotalPointsForCards = (cards) => {
   return cards.reduce((total, card) => {
-    return total + getPointsForMatchAmount(card.matches);
+    return total + getPointsForMatches(card.matches);
   }, 0);
 };
 
-const getScratchCardAmount = (cards) => {
+const getTotalCards = (cards) => {
   for (let i = 0; i < cards.length; i++) {
     // Loop through the next [current card's matches] cards
     for (let x = i + 1; x <= i + cards[i].matches; x++) {
@@ -75,10 +67,10 @@ describe("solution", () => {
     expect(getTotalPointsForCards(parseCards(mock))).toBe(13);
   });
   it("should return the correct answer for part 2 mock", () => {
-    expect(getScratchCardAmount(parseCards(mock))).toBe(30);
+    expect(getTotalCards(parseCards(mock))).toBe(30);
   });
 });
 
 // Answers
 console.log("Part 1:", getTotalPointsForCards(parseCards(input)));
-console.log("Part 2:", getScratchCardAmount(parseCards(input)));
+console.log("Part 2:", getTotalCards(parseCards(input)));
