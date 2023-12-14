@@ -52,9 +52,12 @@ const getTotalPointsForCards = (cards) => {
 
 const getTotalCards = (cards) => {
   for (let i = 0; i < cards.length; i++) {
-    // Loop through the next [current card's matches] cards
+    /* 
+      Loop through next X cards,
+      Where X is the number of matches for the current card
+    */
     for (let x = i + 1; x <= i + cards[i].matches; x++) {
-      // Increment copies by one for each copy of current card
+      // Increment copy amount by one for each copy of current card
       cards[x].copies += cards[i].copies;
     }
   }
