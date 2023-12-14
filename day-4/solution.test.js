@@ -19,12 +19,7 @@ const parseCards = (input) => {
     const parts = line
       .split(":")[1]
       .split("|")
-      .map((group) =>
-        group
-          .trim()
-          .split(" ")
-          .filter((num) => num !== "")
-      );
+      .map((group) => group.trim().split(/\s+/));
     return {
       need: parts[0],
       have: parts[1],
@@ -35,13 +30,12 @@ const parseCards = (input) => {
 };
 
 /*
-  1 match, 1 point
-  2 matches, 1 * 2 = 2 points
-  3 matches, 1 * 2 * 2 = 4 points 
+  1 match => 1 point
+  2 matches => 1 * 2 = 2 points
+  3 matches => 1 * 2 * 2 = 4 points 
 */
 const getPointsForMatches = (match) => {
-  if (!match) return 0;
-  return 1 * Math.pow(2, match - 1);
+  return match ? Math.pow(2, match - 1) : 0;
 };
 
 const getTotalPointsForCards = (cards) => {
