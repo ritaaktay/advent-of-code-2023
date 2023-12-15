@@ -31,15 +31,14 @@ const parseMaps = (input) => {
 };
 
 /*
-i =>  seeds: [ 79, 14, 55, 13 ], maps
-o =>  lowest location
+i => source, map: [{ source, destination, range }]
+o => destination
 
-- Reduce maps to final destination array
-  - Acc starts with seeds as first source array
-  - For each map
-    - Convert source array to destination array
-    - Return as source array for next map
-- Return min of final destination array
+- For each conversion in map
+  - If source point is in source range
+  - Return destination point
+- (If source point is in no source range)
+- Return source point
 */
 const getSourceToDestination = (source, map) => {
   for (let conversion of map) {
@@ -52,14 +51,15 @@ const getSourceToDestination = (source, map) => {
 };
 
 /*
-i => source, map: [{ source, destination, range }]
-o => destination
+i =>  seeds: [ 79, 14, 55, 13 ], maps
+o =>  lowest location
 
-- For each conversion in map
-  - If source point is in source range
-  - Return destination point
-- (If source point is in no source range)
-- Return source point
+- Reduce maps to final destination array
+  - Acc starts with seeds as first source array
+  - For each map
+    - Convert source array to destination array
+    - Return as source array for next map
+- Return min of final destination array
 */
 const getLowestLocation = (seeds, maps) => {
   return Math.min(
