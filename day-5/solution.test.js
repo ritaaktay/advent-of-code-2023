@@ -37,7 +37,7 @@ o => destination
 - For each conversion in map
   - If source point is in source range
   - Return destination point
-- (If source point is in no source range)
+- (If source point is in none of the source ranges)
 - Return source point
 */
 const getSourceToDestination = (source, map) => {
