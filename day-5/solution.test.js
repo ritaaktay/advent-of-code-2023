@@ -6,16 +6,13 @@ const input = readFileSync("./day-5/input-1.txt").toString();
 
 // Solutions
 /*
-  i => string:
-  seed-to-soil map:
-  50 98 2
-  52 50 48
-  o => maps: 
-  [
-    [ { source, destination, range }, { source, destination, range }]
-    [ { source, destination, range }, { source, destination, range }]
-    [ { source, destination, range }, { source, destination, range }]
-  ]
+i => string
+o => maps
+[
+  [ { source, destination, range }, { source, destination, range }]
+  [ { source, destination, range }, { source, destination, range }]
+  [ { source, destination, range }, { source, destination, range }]
+]
 */
 const parseMaps = (input) => {
   return Array.from(input.matchAll(/:([\d\s\n]+)/g)).map((m) =>
@@ -33,15 +30,16 @@ const parseMaps = (input) => {
   );
 };
 
-/* 
-  i => source, map: [{ source, destination, range }]
-  0 => destination
+/*
+i =>  seeds: [ 79, 14, 55, 13 ], maps
+o =>  lowest location
 
-  For each conversion in map
-    If source point is in source range
-    Return destination point
-  (If source point is in no source range)
-  Return source point
+- Reduce maps to final destination array
+  - Acc starts with seeds as first source array
+  - For each map
+    - Convert source array to destination array
+    - Return as source array for next map
+- Return min of final destination array
 */
 const getSourceToDestination = (source, map) => {
   for (let conversion of map) {
@@ -54,15 +52,14 @@ const getSourceToDestination = (source, map) => {
 };
 
 /*
-  i =>  seeds: [ 79, 14, 55, 13 ], maps
-  o =>  lowest location
+i => source, map: [{ source, destination, range }]
+o => destination
 
-  Reduce maps to final destination array
-    Acc starts with seeds as first source array
-    For each map
-      Convert source array to destination array
-      Return as source array for next map
-  Return min of final destination array
+- For each conversion in map
+  - If source point is in source range
+  - Return destination point
+- (If source point is in no source range)
+- Return source point
 */
 const getLowestLocation = (seeds, maps) => {
   return Math.min(
@@ -82,19 +79,17 @@ describe("solution", () => {
   });
 });
 
-const seeds = [
-  4121823, 421491713, 1255413673, 350530906, 944138913, 251104806, 481818804,
-  233571979, 2906248740, 266447632, 3454130719, 50644329, 1920342932, 127779721,
-  2109326496, 538709762, 3579244700, 267233350, 4173137165, 60179884,
-];
-
 // Answers
-console.log("Part 1:", getLowestLocation(seeds, parseMaps(input)));
+console.log(
+  "Part 1:",
+  getLowestLocation(
+    [
+      4121823, 421491713, 1255413673, 350530906, 944138913, 251104806,
+      481818804, 233571979, 2906248740, 266447632, 3454130719, 50644329,
+      1920342932, 127779721, 2109326496, 538709762, 3579244700, 267233350,
+      4173137165, 60179884,
+    ],
+    parseMaps(input)
+  )
+);
 console.log("Part 2:");
-
-// Notes
-/*
-  The numbers are big
-  But it is about the relationships between numbers
-  So maybe that can be enough to get the answer?
-*/
