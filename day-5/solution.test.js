@@ -10,21 +10,17 @@ const input = readFileSync("./day-5/input-1.txt").toString();
 /* 
 I cannot consider each seed individually because the range of the seeds is too large.
 Since the relationships are all described as ranges, I can compare the ranges to each other instead.
-When I am dealing with ranges I will only be dealing with the delimiting numbers, 
-not the numbers in between.
+When I am dealing with ranges I will only be dealing with the delimiting numbers, not the numbers in between.
 
 We need to:
 
-1) Convert the source ranges to destination ranges,
+- Convert the source ranges to destination ranges,
    Iteratively for all maps where,
    One map's destination ranges are the next map's source ranges
+- Get the start of the lowest final destination range
 
-2) Get the start of the lowest final destination range
-
-The only tricky part is, 
-A source range can correspond to multiple conversions of a map,
-Or some parts of the range might not be in the map at all.
-
+The only tricky part is, a source range can correspond to multiple conversions of a map,
+or some parts of the range might not be in the map at all.
 So ranges will have to break up into multiple ranges;
 We'll need to perform intersection, subtraction and conversion on ranges.
 */
@@ -218,12 +214,14 @@ const getLowestLocationFromRanges = (ranges, maps) => {
 };
 
 // Tests
+
 describe("solution", () => {
   it("should return the correct answer for part 1 mock", () => {
     expect(getLowestLocationFromPoints([79, 14, 55, 13], parseMaps(mock))).toBe(
       35
     );
   });
+
   it("should return the correct answer for part 2 mock", () => {
     expect(
       getLowestLocationFromRanges(
@@ -235,13 +233,17 @@ describe("solution", () => {
 });
 
 // Answers
+
 const seeds = [
   4121823, 421491713, 1255413673, 350530906, 944138913, 251104806, 481818804,
   233571979, 2906248740, 266447632, 3454130719, 50644329, 1920342932, 127779721,
   2109326496, 538709762, 3579244700, 267233350, 4173137165, 60179884,
 ];
+
 const maps = parseMaps(input);
+
 console.log("Part 1:", getLowestLocationFromPoints(seeds, maps));
+
 console.log(
   "Part 2:",
   getLowestLocationFromRanges(getStartRanges(seeds), maps)
