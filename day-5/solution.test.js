@@ -1,12 +1,36 @@
 const { readFileSync } = require("fs");
-const { get } = require("http");
-const { parse } = require("path");
 
 // Inputs
+
 const mock = readFileSync("./day-5/mock-1.txt").toString();
 const input = readFileSync("./day-5/input-1.txt").toString();
 
-// Solutions
+// Notes
+
+/* 
+I cannot consider each seed individually because the range of the seeds is too large.
+Since the relationships are all described as ranges, I can compare the ranges to each other instead.
+When I am dealing with ranges I will only be dealing with the delimiting numbers, 
+not the numbers in between.
+
+We need to:
+
+1) Convert the source ranges to destination ranges,
+   Iteratively for all maps where,
+   One map's destination ranges are the next map's source ranges
+
+2) Get the start of the lowest final destination range
+
+The only tricky part is, 
+A source range can correspond to multiple conversions of a map,
+Or some parts of the range might not be in the map at all.
+
+So ranges will have to break up into multiple ranges;
+We'll need to perform intersection, subtraction and conversion on ranges.
+*/
+
+// Parsing
+
 /*
 i =>  string: 
       " dest start, src start, range
@@ -36,46 +60,6 @@ const parseMaps = (input) => {
 };
 
 /*
-i =>  source, map: [{ src: {start, end}, dst: {start, end} }]
-o =>  destination
-
-For each conversion in map
-  If point is in source range
-  Return corresponding destination point
-If point is in none of the conversion's source ranges
-  Return point
-*/
-const getSourceToDestForPoint = (point, map) => {
-  for (let conversion of map) {
-    const diff = point - conversion.src.start;
-    const range = conversion.src.end - conversion.src.start;
-    if (diff <= range && diff >= 0) {
-      return conversion.dst.start + diff;
-    }
-  }
-  return point;
-};
-
-/*
-i =>  points: [ 79, 14, 55, 13 ], maps
-o =>  lowest location
-
-Reduce maps to final destination array
-  Acc starts with points as first source array
-  For each map
-    Convert source array to destination array
-    Return as source array for next map
-Return min of final destination array 
-*/
-const getLowestLocationFromPoints = (points, maps) => {
-  return Math.min(
-    ...maps.reduce((sources, map) => {
-      return sources.map((source) => getSourceToDestForPoint(source, map));
-    }, points)
-  );
-};
-
-/*
 i =>  seeds: [start, range, start, range] 
 o =>  ranges: [{start, end}, {start, end}]
 */
@@ -86,6 +70,8 @@ const getStartRanges = (input) => {
   }
   return ranges;
 };
+
+// Helpers
 
 /* 
 i => srcRange: {start, end}, mapRange: {start, end}
@@ -140,6 +126,50 @@ const subtractRanges = (sourceRanges, coveredRanges) => {
   }
   return remainingRanges;
 };
+
+// Part 1
+
+/*
+i =>  source, map: [{ src: {start, end}, dst: {start, end} }]
+o =>  destination
+
+For each conversion in map
+  If point is in source range
+  Return corresponding destination point
+If point is in none of the conversion's source ranges
+  Return point
+*/
+const getSourceToDestForPoint = (point, map) => {
+  for (let conversion of map) {
+    const diff = point - conversion.src.start;
+    const range = conversion.src.end - conversion.src.start;
+    if (diff <= range && diff >= 0) {
+      return conversion.dst.start + diff;
+    }
+  }
+  return point;
+};
+
+/*
+i =>  points: [ 79, 14, 55, 13 ], maps
+o =>  lowest location
+
+Reduce maps to final destination array
+  Acc starts with points as first source array
+  For each map
+    Convert source array to destination array
+    Return as source array for next map
+Return min of final destination array 
+*/
+const getLowestLocationFromPoints = (points, maps) => {
+  return Math.min(
+    ...maps.reduce((sources, map) => {
+      return sources.map((source) => getSourceToDestForPoint(source, map));
+    }, points)
+  );
+};
+
+// Part 2
 
 /*
 i =>  sourceRanges: [ {start, end}, {start, end} ]
@@ -216,27 +246,3 @@ console.log(
   "Part 2:",
   getLowestLocationFromRanges(getStartRanges(seeds), maps)
 );
-
-/* 
-Notes on Part 2: 
-
-I cannot consider each seed individually because the range of the seeds is too large.
-Since the relationships are all described as ranges, I can compare the ranges to each other instead.
-When I am dealing with ranges I will only be dealing with the delimiting numbers, 
-not the numbers in between.
-
-We need to:
-
-1) Convert the source ranges to destination ranges,
-   Iteratively for all maps where,
-   One map's destination ranges are the next map's source ranges
-
-2) Get the start of the lowest final destination range
-
-The only tricky part is, 
-A source range can correspond to multiple conversions of a map,
-Or some parts of the range might not be in the map at all.
-
-So ranges will have to break up into multiple ranges;
-We'll need to perform intersection, subtraction and conversion on ranges.
-*/
