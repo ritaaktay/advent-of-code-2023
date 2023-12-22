@@ -1,11 +1,13 @@
 const { readFileSync } = require("fs");
-
-// Inputs
-
+const {
+  parseMaps,
+  getStartRanges,
+  getOverlap,
+  subtractRanges,
+  convertRange,
+} = require("./helpers");
 const mock = readFileSync("./day-5/mock-1.txt").toString();
 const input = readFileSync("./day-5/input-1.txt").toString();
-
-// Notes
 
 /* 
 I cannot consider each seed individually because the range of the seeds is too large.
@@ -24,104 +26,6 @@ or some parts of the range might not be in the map at all.
 So ranges will have to break up into multiple ranges;
 We'll need to perform intersection, subtraction and conversion on ranges.
 */
-
-// Parsing
-
-/*
-i =>  string: 
-      " dest start, src start, range
-        dest start, src start, range "
-      
-o =>  maps:
-      [
-        [ { src: { start, end }, dst: {  start, end }
-          { src: { start, end }, dst: {  start, end } ], 
-        [ { src: { start, end }, dst: {  start, end }
-          { src: { start, end }, dst: {  start, end } ]
-      ]
-*/
-const parseMaps = (input) => {
-  return Array.from(input.matchAll(/:([\d\s\n]+)/g)).map((m) =>
-    m[1]
-      .trim()
-      .split("\n")
-      .map((conversion) => {
-        const nums = conversion.split(" ").map((n) => parseInt(n));
-        return {
-          src: { start: nums[1], end: nums[1] + nums[2] - 1 },
-          dst: { start: nums[0], end: nums[0] + nums[2] - 1 },
-        };
-      })
-  );
-};
-
-/*
-i =>  seeds: [start, range, start, range] 
-o =>  ranges: [{start, end}, {start, end}]
-*/
-const getStartRanges = (input) => {
-  const ranges = [];
-  for (let i = 0; i < input.length; i += 2) {
-    ranges.push({ start: input[i], end: input[i] + input[i + 1] - 1 });
-  }
-  return ranges;
-};
-
-// Helpers
-
-/* 
-i => srcRange: {start, end}, mapRange: {start, end}
-o => overlap: {start end}
-*/
-const getOverlap = (srcRange, mapRange) => {
-  if (srcRange.end < mapRange.start || srcRange.start > mapRange.end) {
-    return null;
-  }
-  return {
-    start: Math.max(srcRange.start, mapRange.start),
-    end: Math.min(srcRange.end, mapRange.end),
-  };
-};
-
-/*
-i =>  range (in source): {start, end} 
-      conversion: { src: {start, end}, dst: {start, end} }
-o =>  range (in destination): {start, end}
-*/
-const convertRange = (range, conversion) => {
-  const diff = conversion.dst.start - conversion.src.start;
-  return { start: range.start + diff, end: range.end + diff };
-};
-
-/*
-i =>  sourceRanges: [{start, end}, {start, end}]
-      coveredRanges: [{start, end}, {start, end}]
-o =>  remainingRanges: [{start, end}, {start, end}]
-
-For each range in covered ranges
-  Convert remaining ranges to the difference
-    Comparing each remaining range to the covered range
-    And substituting it with the difference
-*/
-const subtractRanges = (sourceRanges, coveredRanges) => {
-  let remainingRanges = [...sourceRanges];
-  for (let coveredRange of coveredRanges) {
-    remainingRanges = remainingRanges.reduce((acc, remainingRange) => {
-      const overlap = getOverlap(remainingRange, coveredRange);
-      if (!overlap) {
-        return [...acc, remainingRange];
-      }
-      if (remainingRange.start < overlap.start) {
-        acc.push({ start: remainingRange.start, end: overlap.start - 1 });
-      }
-      if (remainingRange.end > overlap.end) {
-        acc.push({ start: overlap.end + 1, end: remainingRange.end });
-      }
-      return acc;
-    }, []);
-  }
-  return remainingRanges;
-};
 
 // Part 1
 
@@ -174,24 +78,25 @@ i =>  sourceRanges: [ {start, end}, {start, end} ]
 o =>  destinationRanges: [ {start, end}, {start, end} ]
 
 For all conversions in map
-    For all source ranges 
-      Accumulate the destination ranges
-      Accumulate the covered ranges
-Add uncovered source ranges without conversion
+    For all remaining source ranges
+      Accumulate the converted ranges 
+      Subtract the converted ranges from the remaining ranges before next conversion
+Return the converted ranges and the remaining ranges
 */
+
 const getSourceToDestForRanges = (sourceRanges, map) => {
-  const destinationRanges = [];
-  const coveredRanges = [];
-  for (let sourceRange of sourceRanges) {
-    for (let conversion of map) {
-      const overlap = getOverlap(sourceRange, conversion.src);
-      if (overlap) {
-        destinationRanges.push(convertRange(overlap, conversion));
-        coveredRanges.push(overlap);
-      }
+  const convertedRanges = [];
+  let remainingRanges = [...sourceRanges];
+  for (let conversion of map) {
+    const remainingAfterConversion = [];
+    for (let remainingRange of remainingRanges) {
+      const overlap = getOverlap(remainingRange, conversion.src);
+      if (overlap) convertedRanges.push(convertRange(overlap, conversion));
+      remainingAfterConversion.push(...subtractRanges(remainingRange, overlap));
     }
+    remainingRanges = remainingAfterConversion;
   }
-  return [...destinationRanges, ...subtractRanges(sourceRanges, coveredRanges)];
+  return [...convertedRanges, ...remainingRanges];
 };
 
 /*
@@ -242,9 +147,9 @@ const seeds = [
 
 const maps = parseMaps(input);
 
-console.log("Part 1:", getLowestLocationFromPoints(seeds, maps));
+console.log("Part 1:", getLowestLocationFromPoints(seeds, maps)); // 251346198
 
 console.log(
   "Part 2:",
   getLowestLocationFromRanges(getStartRanges(seeds), maps)
-);
+); //72263011
