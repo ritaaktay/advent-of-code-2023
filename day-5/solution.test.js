@@ -10,21 +10,19 @@ const mock = readFileSync("./day-5/mock-1.txt").toString();
 const input = readFileSync("./day-5/input-1.txt").toString();
 
 /* 
-I cannot consider each seed individually because the range of the seeds is too large.
-Since the relationships are all described as ranges, I can compare the ranges to each other instead.
-When I am dealing with ranges I will only be dealing with the delimiting numbers, not the numbers in between.
+I can't consider each seed individually - the range of the seeds is too large.
+But since the relationships are all described between ranges, 
+I can compare the ranges to each other, and deal only with the delimiting numbers.
 
 We need to:
-
 - Convert the source ranges to destination ranges,
    Iteratively for all maps where,
    One map's destination ranges are the next map's source ranges
-- Get the start of the lowest final destination range
 
-The only tricky part is, a source range can correspond to multiple conversions of a map,
-or some parts of the range might not be in the map at all.
-So ranges will have to break up into multiple ranges;
-We'll need to perform intersection, subtraction and conversion on ranges.
+The tricky part is, a source range can correspond to multiple conversions of a map...
+So ranges will keep breaking up into smaller parts. 
+
+We'll need to find intersections, subtractions and conversions of ranges.
 */
 
 // Part 1
