@@ -23,19 +23,24 @@ The tricky part is, a source range can correspond to multiple conversions of a m
 So ranges will keep breaking up into smaller parts. 
 
 We'll need to find intersections, subtractions and conversions of ranges.
+
+map: [
+  { src: {start, end}, dst: {start, end} }, // conversion
+  { src: {start, end}, dst: {start, end} }
+]
+
+range: { start, end }
 */
 
 // Part 1
 
 /*
-i =>  source, map: [{ src: {start, end}, dst: {start, end} }]
-o =>  destination
+i =>  source point, map
+o =>  destination point
 
 For each conversion in map
-  If point is in source range
-  Return corresponding destination point
-If point is in none of the conversion's source ranges
-  Return point
+  Return destination point if source point is in range
+  Else return point
 */
 const getSourceToDestForPoint = (point, map) => {
   for (let conversion of map) {
@@ -49,15 +54,15 @@ const getSourceToDestForPoint = (point, map) => {
 };
 
 /*
-i =>  points: [ 79, 14, 55, 13 ], maps
+i =>  points, maps
 o =>  lowest location
 
-Reduce maps to final destination array
-  Acc starts with points as first source array
+Reduce maps to final destinations
+  Acc starts with source points array
   For each map
-    Convert source array to destination array
-    Return as source array for next map
-Return min of final destination array 
+    Convert source points to destination points
+    Pass onto next map
+Return min
 */
 const getLowestLocationFromPoints = (points, maps) => {
   return Math.min(
@@ -70,41 +75,40 @@ const getLowestLocationFromPoints = (points, maps) => {
 // Part 2
 
 /*
-i =>  sourceRanges: [ {start, end}, {start, end} ]
-      map: [ { src: {start, end}, dst: {start, end} },
-             { src: {start, end}, dst: {start, end} } ] 
-o =>  destinationRanges: [ {start, end}, {start, end} ]
+i =>  source ranges, map
+o =>  destination ranges
 
-For all conversions in map
+For all conversions in a map
     For all remaining source ranges
-      Accumulate the converted ranges 
-      Subtract the converted ranges from the remaining ranges before next conversion
-Return the converted ranges and the remaining ranges
+      Accumulate the destination ranges 
+      And subtract them from the remaining ranges 
+      Pass onto next conversion
+Return the destination ranges plus remaining ranges
 */
 
 const getSourceToDestForRanges = (sourceRanges, map) => {
-  const convertedRanges = [];
+  const destinationRanges = [];
   let remainingRanges = [...sourceRanges];
   for (let conversion of map) {
     const remainingAfterConversion = [];
     for (let remainingRange of remainingRanges) {
       const overlap = getOverlap(remainingRange, conversion.src);
-      if (overlap) convertedRanges.push(convertRange(overlap, conversion));
+      if (overlap) destinationRanges.push(convertRange(overlap, conversion));
       remainingAfterConversion.push(...subtractRanges(remainingRange, overlap));
     }
     remainingRanges = remainingAfterConversion;
   }
-  return [...convertedRanges, ...remainingRanges];
+  return [...destinationRanges, ...remainingRanges];
 };
 
 /*
-i =>  ranges: [ {start, end}, {start, end} ], maps
+i =>  ranges, maps
 o =>  lowest destination point
 
 For each map
   Convert source ranges to destination ranges
-  Where the source ranges are the previous map's destination ranges
-Return start of lowest destination range in final destination ranges
+  And pass onto next map
+Return start of lowest range
 */
 
 const getLowestLocationFromRanges = (ranges, maps) => {
@@ -147,7 +151,9 @@ const maps = parseMaps(input);
 
 console.log("Part 1:", getLowestLocationFromPoints(seeds, maps)); // 251346198
 
+const before = Date.now();
 console.log(
   "Part 2:",
   getLowestLocationFromRanges(getStartRanges(seeds), maps)
 ); //72263011
+console.log("That took:", Date.now() - before, "ms");

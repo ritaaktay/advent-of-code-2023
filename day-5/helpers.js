@@ -1,16 +1,7 @@
 /*
-i =>  string: 
-      " dest start, src start, range
-        dest start, src start, range "
-      
-o =>  maps:
-      [
-        [ { src: { start, end }, dst: {  start, end }
-          { src: { start, end }, dst: {  start, end } ], 
-        [ { src: { start, end }, dst: {  start, end }
-          { src: { start, end }, dst: {  start, end } ]
-      ]
+  o => maps: [ [ {src: {start, end}, dst: {start, end}} ] ]
 */
+
 const parseMaps = (input) => {
   return Array.from(input.matchAll(/:([\d\s\n]+)/g)).map((m) =>
     m[1]
@@ -27,8 +18,7 @@ const parseMaps = (input) => {
 };
 
 /*
-  i =>  seeds: [start, range, start, range] 
-  o =>  ranges: [{start, end}, {start, end}]
+  o => ranges: [ {start, end}, {start, end}]
 */
 const getStartRanges = (input) => {
   const ranges = [];
@@ -39,40 +29,38 @@ const getStartRanges = (input) => {
 };
 
 /* 
-  i => srcRange: {start, end}, mapRange: {start, end}
-  o => overlap: {start end}
+  i => range1, range2
+  o => overlap
 */
-const getOverlap = (srcRange, mapRange) => {
-  if (srcRange.end < mapRange.start || srcRange.start > mapRange.end) {
+const getOverlap = (range1, range2) => {
+  if (range1.end < range2.start || range1.start > range2.end) {
     return null;
   }
   return {
-    start: Math.max(srcRange.start, mapRange.start),
-    end: Math.min(srcRange.end, mapRange.end),
+    start: Math.max(range1.start, range2.start),
+    end: Math.min(range1.end, range2.end),
   };
 };
 
 /*
-  i =>  sourceRange: { start, end }
-        coveredRanges: { start, end }
-  o =>  remainingRange: { start, end}, {start, end}
+  i =>  range1, range2
+  o =>  difference
 */
-const subtractRanges = (sourceRange, coveredRange) => {
-  if (!coveredRange) return [sourceRange];
+const subtractRanges = (range1, range2) => {
+  if (!range2) return [range1];
   const difference = [];
-  if (sourceRange.start < coveredRange.start) {
-    difference.push({ start: sourceRange.start, end: coveredRange.start - 1 });
+  if (range1.start < range2.start) {
+    difference.push({ start: range1.start, end: range2.start - 1 });
   }
-  if (sourceRange.end > coveredRange.end) {
-    difference.push({ start: coveredRange.end + 1, end: sourceRange.end });
+  if (range1.end > range2.end) {
+    difference.push({ start: range2.end + 1, end: range1.end });
   }
   return difference;
 };
 
 /*
-  i =>  range (in source): {start, end} 
-        conversion: { src: {start, end}, dst: {start, end} }
-  o =>  range (in destination): {start, end}
+  i =>  range, conversion
+  o =>  converted range
 */
 const convertRange = (range, conversion) => {
   const diff = conversion.dst.start - conversion.src.start;
