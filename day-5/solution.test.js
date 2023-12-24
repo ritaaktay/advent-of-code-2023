@@ -152,8 +152,10 @@ const maps = parseMaps(input);
 console.log("Part 1:", getLowestLocationFromPoints(seeds, maps)); // 251346198
 
 const before = Date.now();
+
 console.log(
   "Part 2:",
   getLowestLocationFromRanges(getStartRanges(seeds), maps)
 ); //72263011
+
 console.log("That took:", Date.now() - before, "ms");
